@@ -7,22 +7,29 @@ from config import token, chat_id, file1, file2
 UpIp = ''
 DownIp = ''
 
+def list_broken():
+    with open(file2,'r') as f2:
+        broken = f2.readlines()
+        broken = list(map(lambda s: s.strip(), broken))
+        return(broken)
+
+def telesend(list_ip,message):
+    if len(list_ip) is not 0:
+        bot.send_message(chat_id,message)
+
 #main program
 bot = TeleBot(token)
-with open(file2, 'r') as f2:
-    broken = f2.readlines()
-    broken = list(map(lambda s: s.strip(), broken))
 with open(file1,'r') as f:
     x=f.readlines()
     for ip in x:
         response_list=ping(ip,verbose=False,count=5,timeout=1)
         if response_list._responses[0].success:
             if ip.strip("\n") in broken:
-                UpIp+=ip+'\n'
+                UpIp+=ip
                 with open(file2, 'w') as f3:
                     for line in broken:
                         if line.strip("\n") != ip.strip("\n"):
-                            f3.write(line)
+                            f3.write(line+'\n')
             else:
                 pass
         else:
@@ -32,10 +39,6 @@ with open(file1,'r') as f:
                     f3.write(ip)
             else:
                 pass
-
-def telesend(list_ip,message):
-    if len(list_ip) is not 0:
-        bot.send_message(chat_id,message)
 
 telesend(UpIp,'#cam\nis up\n'+UpIp)
 telesend(DownIp,'#cam\nis down\n'+DownIp)
